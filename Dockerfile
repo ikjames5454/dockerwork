@@ -1,10 +1,9 @@
-FROM openjdk:11-jre-slim
 
-ENV JAVA_OPTS "Xms512m -Xmx512m -Djava.security.egd=file:/dev/./urandom"
+FROM maven:3.8.7 as build
+COPY . .
+RUN mvn  package
 
-WORKDIR application
-
-COPY ../../../target/docker-0.0.1-SNAPSHOT.jar ./
-
-ENTRYPOINT ["java", "-jar", "docker-0.0.1-SNAPSHOT.jar"]
+FROM openjdk:17
+COPY --from=build target/*.jar app.jar
+ENTRYPOINT ["java", "-jar",  "app.jar"]
 
